@@ -1,0 +1,18 @@
+body {
+    margin: 0;
+}
+
+#topbar {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    padding-left: 0.5em;
+    padding-right: 0.5em;
+}
+
+#access-link-wrapper {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    column-gap: 1em;
+}
