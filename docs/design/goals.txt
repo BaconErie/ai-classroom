@@ -1,0 +1,6 @@
+1. Classroom accounts include teachers, students
+2. School systems sign up for classroom accounts; that way teachers cannot bypass school system rules
+3. Open accounts have free access to the chatbot AI, however, they cannot be on a list of student names.
+    a. Verified by ID
+    b. Student names are provided by school systems
+    c. Student names must be stored securely (hashed)
