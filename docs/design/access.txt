@@ -1,0 +1,23 @@
+CREATING ACCOUNTS /signup
+Only for Open accounts
+
+1. If user is a student, ask them to sign in through their school system and go to login
+2. Ask for email, name, password, ID 
+3. If email already exists do not use
+4. If name is in student list, do not allow them to sign up
+5. Otherwise, send confirmation email, check ID, and then send access
+
+LOGIN /login
+1. If student, teacher, login through school system. Redirect to /login/classroom
+2. If personal or business, continue.
+3. Get email and password. If account doesn't exist, send 400 and error message
+4. Otherwise, give JWT token with user_id, redirect to /home
+
+LOGIN /login/classroom
+1. Allow user to search for school system
+2. Select school system, redirect to /login/classroom/<school_system_id>
+
+LOGIN /login/classroom/<school_system_id>
+1. Return login with login page with "Sign in through <SCHOOL SYSTEM NAME>", with link to /login/classroom (Not your schools system?)
+2. Get email and password. If account doesn't exist, send 400 and error message
+3. Otherwise, give JWT token with user_id, redirect to /home
