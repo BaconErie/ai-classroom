@@ -1,0 +1,41 @@
+a {
+    color: black;
+}
+
+div {
+    border-radius: 15px;
+}
+
+#main-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+#main-content {
+    border-style: solid;
+    padding: 1em;
+}
+
+#choose-role {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+    gap: 1em;
+}
+
+.role-button {
+    border-style: solid;
+    flex: 1 1 0px;
+    padding: 0.5em;
+    text-align: center;
+    transition: 0.2s;
+}
+
+.role-button:hover {
+    box-shadow: 0px 0px 5px;
+}
+
+.role-button:active {
+    box-shadow: none;
+}
