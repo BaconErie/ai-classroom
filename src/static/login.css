@@ -15,6 +15,7 @@ div {
 #main-content {
     border-style: solid;
     padding: 1em;
+    width: 30em;
 }
 
 #choose-role {
@@ -38,4 +39,8 @@ div {
 
 .role-button:active {
     box-shadow: none;
+}
+
+.hidden {
+    display: none;
 }
