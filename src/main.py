@@ -9,7 +9,7 @@ def index():
 
 @app.route('/signup')
 def signup():
-    return 'Signup'
+    return render_template('signup.html')
 
 @app.route('/login')
 def login():
