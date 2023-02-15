@@ -1,7 +1,9 @@
 const searchBar = document.getElementById('school-search-bar');
 const schoolList = document.getElementById('school-system-list');
 
-async function searchBarChanged(event) {
+let stopTypingTimeout = 0;
+
+async function stopTypingTimeoutEnd() {
     let searchBarContent = searchBar.value;
 
     if (searchBarContent.length < 1) {
@@ -27,4 +29,10 @@ async function searchBarChanged(event) {
         schoolList.appendChild(link);
     }
 }
+
+async function searchBarChanged(event) {
+    clearTimeout(stopTypingTimeout);
+    stopTypingTimeout = setTimeout(stopTypingTimeoutEnd, 1000);
+}
+
 searchBar.addEventListener('input', searchBarChanged)
