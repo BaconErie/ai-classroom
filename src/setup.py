@@ -28,12 +28,19 @@ response = cursor.execute('SELECT name FROM sqlite_master WHERE type=\'table\' A
 if response.fetchone() is None:
     cursor.execute('CREATE TABLE chat_logs (id INTEGER PRIMARY KEY AUTOINCREMENT, prompt TEXT, response TEXT, date INTEGER, session_id INTEGER)')
 
-# Create table for session
+# Create table for open_chat_sessions
 
-response = cursor.execute('SELECT name FROM sqlite_master WHERE type=\'table\' AND name=\'chat_sessions\';')
+response = cursor.execute('SELECT name FROM sqlite_master WHERE type=\'table\' AND name=\'open_chat_session\';')
 
 if response.fetchone() is None:
-    cursor.execute('CREATE TABLE chat_sessions (id INTEGER PRIMARY KEY AUTOINCREMENT, user_id INTEGER)')
+    cursor.execute('CREATE TABLE open_chat_sessions (id INTEGER PRIMARY KEY AUTOINCREMENT, user_id INTEGER)')
+
+# Create table for classroom_chat_sessions
+
+response = cursor.execute('SELECT name FROM sqlite_master WHERE type=\'table\' AND name=\'classroom_chat_sessions\';')
+
+if response.fetchone() is None:
+    cursor.execute('CREATE TABLE classroom_chat_sessions (id INTEGER PRIMARY KEY AUTOINCREMENT, user_id INTEGER, classroom_id INTEGER)')
 
 
 response = cursor.execute('SELECT name FROM sqlite_master WHERE type=\'table\' AND name=\'STUDENT_NAMES\';')
