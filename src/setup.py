@@ -50,3 +50,5 @@ if response.fetchone() is None:
 
     for dict in DEFAULT_LIST:
         cursor.execute('INSERT INTO STUDENT_NAMES (hash, suffix, salt) VALUES (?, ?, ?)', (dict['hash'], dict['suffix'], dict['salt']))
+
+connection.close()
