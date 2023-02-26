@@ -18,7 +18,7 @@
                     <div class="role-button" id="open">
                         <p>I am creating an account for personal or business use</h3>
                     </div>
-
+                    
                     <div class="role-button" id="classroom">
                         <p>I am creating an account for school use</h3>
                     </div>
@@ -28,41 +28,7 @@
                     <p>You need to sign in through your school system to use the chatbot for school.</p>
                     <a href="/login/classroom">Sign in through your school system</a>
                 </div>
-
-                <form action="/signup" method="post" id="signup-form" class="hidden">
-                    <div id="name-wrapper">
-                        <div>
-                            <label for="fname">First name</label><br>
-                            <input type="text" name="fname">
-                        </div>
-
-                        <div>
-                            <label for="mname">Middle name</label><br>
-                            <input type="text" name="mname">
-                        </div>
-
-                        <div>
-                            <label for="lname">Last name</label><br>
-                            <input type="text" name="lname">
-                        </div>
-                    </div>
-
-                    <br>
-
-                    <label for="email">Email</label><br>
-                    <input type="text" name="email"><br><br>
-
-                    <label for="password">Password</label><br>
-                    <input type="password" name="password"><br><br>
-
-                    <label for="id">ID<br><span style="font-size: 0.75em">Must be a valid government issued ID (such as a driver's license)</span></label>
-                    <input type="file" name="id"><br><br>
-
-                    <input type="submit" value="Sign up">
-                </form>
-            </div>
-        </div>
-
+                
         <script src="{{ url_for('static', filename='scripts/signup.js') }}"></script>
     </body>
 </html>

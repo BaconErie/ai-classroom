@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Sign up - Terminal</title>
+        <link rel="stylesheet" href="{{ url_for('static', filename='signup.css') }}">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+    </head>
+
+    <body>
+        <div id="topbar">
+            <h1><a href="/">Terminal</a></h1>
+        </div>
+
+        <div id="main-wrapper">
+            <div id="main-content">
+                <h2>Sign up</h2>
+
+                <form method="post" id="signup-form">
+                    {% if error %}
+                        <div id="error">
+                            <b>Error</b>: {{error}}
+                        </div>
+                    {% endif %}
+                    <br>
+                    <div id="name-wrapper">
+                        <div>
+                            <label for="fname">First name</label><br>
+                            <input type="text" name="fname" value="{{ request.form['fname'] }}">
+                        </div>
+
+                        <div>
+                            <label for="mname">Middle name</label><br>
+                            <input type="text" name="mname" value="{{ request.form['mname'] }}">
+                        </div>
+
+                        <div>
+                            <label for="lname">Last name</label><br>
+                            <input type="text" name="lname" value="{{ request.form['lname'] }}">
+                        </div>
+                    </div>
+
+                    <br>
+
+                    <label for="email">Email</label><br>
+                    <input type="text" name="email" value="{{ request.form['email'] }}"><br><br>
+
+                    <label for="bday">Birthdate</label><br>
+                    <input type="date" name="bday" value="{{ request.form['bday'] }}"><br><br>
+
+                    <label for="password">Password</label><br>
+                    <input type="password" name="password"><br><br>
+
+                    <label for="id">ID<br><span style="font-size: 0.75em">Must be a valid government issued ID (such as a driver's license)</span></label>
+                    <input type="file" name="id"><br><br>
+
+                    <input type="submit" value="Sign up">
+                </form>
+            </div>
+        </div>
+    </body>
+</html>

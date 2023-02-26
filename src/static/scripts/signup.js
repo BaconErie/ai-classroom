@@ -10,8 +10,7 @@ function classroomClicked(event) {
 }
 
 function openClicked(event) {
-    chooseRole.style.display = 'none';
-    signUpForm.style.display = 'block';
+    window.location.assign('/signup/open');
 }
 
 classroom.addEventListener('click', classroomClicked);

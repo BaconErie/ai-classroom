@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Terminal</title>
+        <link rel="stylesheet" href="{{ url_for('static', filename='signup.css') }}">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+    </head>
+
+    <body>
+        <div id="topbar">
+            <h1><a href="/">Terminal</a></h1>
+        </div>
+
+        <div id="main-wrapper">
+            <div id="main-content">
+                <h2>Sign up</h2>
+                <div>
+                    {% if signup_sucess %}
+                    Thank you for signing up! Your sign up request has been submitted. Please give us some time to process your request. You will receive an email when your request is approved.
+                    {% else %}
+                    We have found your name in our student database. Please <a href="/login/classroom">log in through your school system</a> or ask your school system to sign up for Terminal.
+                    {% endif %} 
+                </div>
+                
+        <script src="{{ url_for('static', filename='scripts/signup.js') }}"></script>
+    </body>
+</html>
