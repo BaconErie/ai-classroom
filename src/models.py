@@ -12,7 +12,7 @@ class OpenUser:
         connection = sqlite3.connect('data.db')
         cursor = connection.cursor()
 
-        cursor.execute('SELECT * FROM open_users WHERE id=?', (id))
+        cursor.execute('SELECT * FROM open_users WHERE id=?', [id])
         response = cursor.fetchone()
 
         connection.close()
@@ -26,7 +26,7 @@ class OpenUser:
         connection = sqlite3.connect('data.db')
         cursor = connection.cursor()
 
-        cursor.execute('SELECT * FROM open_users WHERE email=?', (id))
+        cursor.execute('SELECT * FROM open_users WHERE email=?', [email])
         response = cursor.fetchone()
 
         connection.close()
@@ -47,21 +47,21 @@ class OpenUser:
         salt = secrets.token_hex(64)
 
         # Hash password
-        hashed_password = hashlib.sha256(f'{password};{salt}').hexdigest()
+        hashed_password = hashlib.sha256(f'{password};{salt}'.encode('utf-8')).hexdigest()
 
         # INSERT DATA INTO DATABASE #
         connection = sqlite3.connect('data.db')
         cursor = connection.cursor()
 
-        cursor.execute('INSERT INTO open_users (email, name, password, salt) VALUES (?, ?, ?, ?)', (email, name, hashed_password, salt))
-        cursor.commit()
+        cursor.execute('INSERT INTO open_users (email, name, password, salt) VALUES (?, ?, ?, ?)', [email, name, hashed_password, salt])
+        connection.commit()
 
-        cursor.execute('SELECT id FROM open_users WHERE email=?', (email))
+        cursor.execute('SELECT id FROM open_users WHERE email=?', [email])
         id = cursor.fetchone()[0]
 
         connection.close()
 
-        return OpenUser.__init__(id, email, name, hashed_password, salt)
+        return OpenUser(id, email, name, hashed_password, salt)
 
     # INSTANCE METHODS #
 
@@ -77,7 +77,7 @@ class OpenUser:
         connection = sqlite3.connect('data.db')
         cursor = connection.cursor()
 
-        cursor.execute('SELECT id, name FROM open_chat_sessions WHERE user_id=?', (self.id))
+        cursor.execute('SELECT id, name FROM open_chat_sessions WHERE user_id=?', [self.id])
         response = cursor.fetchall()
 
         if len(response) == 0:
@@ -94,8 +94,8 @@ class OpenUser:
         connection = sqlite3.connect('data.db')
         cursor = connection.cursor()
 
-        cursor.execute('INSERT INTO open_chat_sessions (name, user_id) VALUES (?, ?)', (name, self.id))
-        cursor.commit()
+        cursor.execute('INSERT INTO open_chat_sessions (name, user_id) VALUES (?, ?)', [name, self.id])
+        connection.commit()
 
         cursor.execute('SELECT LAST_INSERT_ROWID();')
         id = cursor.fetchone()[0]
@@ -114,11 +114,11 @@ class OpenChatSession:
         connection = sqlite3.connect('data.db')
         cursor = connection.cursor()
 
-        cursor.execute('DELETE FROM chat_logs WHERE session_id=?', (self.id))
-        cursor.commit()
+        cursor.execute('DELETE FROM chat_logs WHERE session_id=?', [self.id])
+        connection.commit()
 
-        cursor.execute('DELETE FROM open_chat_sessions WHERE id=?', (self.id))
-        cursor.commit()
+        cursor.execute('DELETE FROM open_chat_sessions WHERE id=?', [self.id])
+        connection.commit()
 
         connection.close()
 
@@ -126,7 +126,7 @@ class OpenChatSession:
         connection = sqlite3.connect('data.db')
         cursor = connection.cursor()
 
-        cursor.execute('SELECT * FROM chat_logs WHERE session_id=?', (self.id))
+        cursor.execute('SELECT * FROM chat_logs WHERE session_id=?', [self.id])
         response = cursor.fetchall()
 
         connection.close()
@@ -150,8 +150,8 @@ class OpenChatSession:
         connection = sqlite3.connect('data.db')
         cursor = connection.cursor()
 
-        cursor.execute('INSERT INTO chat_logs (prompt, response, date, session_id) VALUES (?, ?, ?, ?)', (prompt, response, date.timestamp(), self.id))
-        cursor.commit()
+        cursor.execute('INSERT INTO chat_logs (prompt, response, date, session_id) VALUES (?, ?, ?, ?)', [prompt, response, date.timestamp(), self.id])
+        connection.commit()
 
         cursor.execute('SELECT LAST_INSERT_ROWID();')
         id = cursor.fetchone()[0]
@@ -182,3 +182,6 @@ class UserAlreadyExistsException(Exception):
     def __init__(self, email):
         self.email = email
         super().__init__(f'User with email {email} already exists.')
+'''
+import models
+user = models.OpenUser.create_user('email@example.com', 'John Doe', 'asdfasdfasdfasdf')'''
