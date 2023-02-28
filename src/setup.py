@@ -20,7 +20,7 @@ if response.fetchone() is None:
 response = cursor.execute('SELECT name FROM sqlite_master WHERE type=\'table\' AND name=\'classroom_users\';')
 
 if response.fetchone() is None:
-    cursor.execute('CREATE TABLE classroom_users (id INTEGER PRIMARY KEY AUTOINCREMENT, email TEXT, name TEXT, password TEXT, salt TEXT, school_system_id INTEGER, teacher INTEGER);')
+    cursor.execute('CREATE TABLE classroom_users (id INTEGER PRIMARY KEY AUTOINCREMENT, email TEXT, name TEXT, password TEXT, salt TEXT, school_system_id INTEGER, teacher BOOLEAN);')
 
 # Create table for chat logs
 
@@ -49,7 +49,7 @@ if response.fetchone() is None:
 response = cursor.execute('SELECT name FROM sqlite_master WHERE type=\'table\' AND name=\'main_classroom_table\';')
 
 if response.fetchone() is None:
-    cursor.execute('CREATE TABLE main_classroom_table (id INTEGER PRIMARY KEY AUTOINCREMENT, teacher_id INTEGER, name TEXT, join_code INTEGER)')
+    cursor.execute('CREATE TABLE main_classroom_table (id INTEGER PRIMARY KEY AUTOINCREMENT, teacher_id INTEGER, name TEXT, join_code INTEGER, is_chat_allowed BOOLEAN, is_logs_allowed BOOLEAN)')
 
 # classroom_students #
 # Links student_ids to classroom_ids
