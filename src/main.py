@@ -122,9 +122,33 @@ def signup_open():
         open_models.OpenUser.create_user(request.form['email'], full_name, request.form['password'])        
         return render_template('signup_outcome.html', signup_sucess=True)
 
-@app.route('/login')
+@app.route('/login', methods=['GET', 'POST'])
 def login():
-    return render_template('login.html')
+    if request.method == 'GET':
+        return render_template('login.html')
+    
+    elif request.method == 'POST':
+        email = request.form['email']
+        password = request.form['password']
+
+        if email == '':
+            return render_template('login_to_classroom.html', error='Please enter an email'), 400
+    
+        if password == '':
+            return render_template('login_to_classroom.html', error='Please enter your password'), 400
+
+        user = open_models.OpenUser.get_user_by_email(email)
+
+        if user is None:
+            return render_template('login_to_classroom.html', error='Please check your username and password and try again'), 400
+        
+        if not check_password(user.password, user.salt, password):
+            return render_template('login_to_classroom.html', error='Please check your username and password and try again'), 400
+        
+        response = make_response(redirect('/home'))
+        response.set_cookie('token', generate_token(user.id))
+
+        return response
 
 @app.route('/login/classroom')
 def login_classroom():
