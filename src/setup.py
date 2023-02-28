@@ -43,13 +43,21 @@ if response.fetchone() is None:
 # CLASSROOM TABLES #
 ####################
 
+# school_system_table #
+# Keeps track of: id of school system, name
+
+response = cursor.execute('SELECT name FROM sqlite_master WHERE type=\'table\' AND name=\'school_system_table\';')
+
+if response.fetchone() is None:
+    cursor.execute('CREATE TABLE school_system_table (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT)')
+
 # main_classroom_table #
-# Keeps id of classroom, teacher_id, name, join_code 
+# Keeps id of classroom, teacher_id, name, join_code, school_system_id, is_chat_allowed, is_logs_allowed
 
 response = cursor.execute('SELECT name FROM sqlite_master WHERE type=\'table\' AND name=\'main_classroom_table\';')
 
 if response.fetchone() is None:
-    cursor.execute('CREATE TABLE main_classroom_table (id INTEGER PRIMARY KEY AUTOINCREMENT, teacher_id INTEGER, name TEXT, join_code INTEGER, is_chat_allowed BOOLEAN, is_logs_allowed BOOLEAN)')
+    cursor.execute('CREATE TABLE main_classroom_table (id INTEGER PRIMARY KEY AUTOINCREMENT, teacher_id INTEGER, name TEXT, join_code INTEGER, school_system_id INTEGER, is_chat_allowed BOOLEAN, is_logs_allowed BOOLEAN)')
 
 # classroom_students #
 # Links student_ids to classroom_ids
