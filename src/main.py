@@ -1,7 +1,8 @@
 from flask import Flask, render_template, request, abort
+from hmac import compare_digest
 from random import randint
 import sqlite3
-import hashlib, hmac
+import hashlib
 from datetime import datetime
 
 import classroom_models
@@ -27,6 +28,11 @@ def is_student(name, birthdate):
             return True
     
     return False
+
+def check_password(hash, salt, plaintext) -> bool:
+    input_hash = hashlib.sha256(f'{plaintext};{salt}'.encode('utf-8')).hexdigest()
+    return compare_digest(hash, input_hash)
+
 
 @app.route('/')
 def index():
@@ -92,14 +98,42 @@ def login_api():
 
     return response_dict
 
-@app.route('/login/classroom/<classroom_public_id>')
+@app.route('/login/classroom/<classroom_public_id>', methods=['GET', 'POST'])
 def login_to_classroom(classroom_public_id):
-    school_system = classroom_models.SchoolSystem.get_school_system_by_id(classroom_public_id)
+    if request.method == 'GET':
+        school_system = classroom_models.SchoolSystem.get_school_system_by_id(classroom_public_id)
 
-    if school_system is None:
-        abort(404)
+        if school_system is None:
+            abort(404, 'Classroom not found')
 
-    return render_template('login_to_classroom.html', school_system=school_system.name)
+        return render_template('login_to_classroom.html', school_system=school_system.name)
+
+
+    elif request.method == 'POST':
+        school_system = classroom_models.SchoolSystem.get_school_system_by_id(classroom_public_id)
+        email = request.form['email']
+        password = request.form['password']
+
+        if school_system is None:
+            abort(404, 'Classroom not found')
+
+        if email == '':
+            return render_template('login_to_classroom.html', school_system=school_system.name, error='Please enter an email'), 400
+    
+        if password == '':
+            return render_template('login_to_classroom.html', school_system=school_system.name, error='Please enter your password'), 400
+
+        user = classroom_models.ClassroomUser.get_user_by_email(email)
+
+        if user is None:
+            return render_template('login_to_classroom.html', school_system=school_system.name, error='Please check your username and password and try again'), 400
+        
+        if not check_password(user.password, user.salt, password):
+            return render_template('login_to_classroom.html', school_system=school_system.name, error='Please check your username and password and try again'), 400
+        
+        return 'signed in [ no token yet :(  ]'
+
+        
 
 if __name__ == '__main__':
     app.run()
