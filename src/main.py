@@ -8,6 +8,7 @@ import os
 from datetime import datetime
 
 import classroom_models
+import open_models
 
 JWT_SECRET = os.environ['JWT_SECRET']
 
@@ -55,7 +56,7 @@ def get_user_from_token(token):
     if id is None:
         return None
 
-    return classroom_models.ClassroomUser.get_user_by_id(id)
+    return classroom_models.ClassroomUser.get_user_by_id(id) or open_models.OpenUser.get_user_by_id(id)
 
 @app.route('/')
 def index():
