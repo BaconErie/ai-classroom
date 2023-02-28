@@ -52,12 +52,12 @@ if response.fetchone() is None:
     cursor.execute('CREATE TABLE main_classroom_table (id INTEGER PRIMARY KEY AUTOINCREMENT, teacher_id INTEGER, name TEXT, join_code INTEGER)')
 
 # classroom_students #
-# Links student_ids and their respective session_id to classroom_ids
+# Links student_ids to classroom_ids
 
 response = cursor.execute('SELECT name FROM sqlite_master WHERE type=\'table\' AND name=\'classroom_students\';')
 
 if response.fetchone() is None:
-    cursor.execute('CREATE TABLE classroom_students (classroom_id INTEGER, student_id INTEGER, session_id INTEGER);')
+    cursor.execute('CREATE TABLE classroom_students (classroom_id INTEGER, student_id INTEGER);')
 
 # Create table for classroom_chat_sessions
 
