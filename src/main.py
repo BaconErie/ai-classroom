@@ -1,11 +1,15 @@
-from flask import Flask, render_template, request, abort
+from flask import Flask, render_template, request, abort, make_response, redirect
 from hmac import compare_digest
 from random import randint
 import sqlite3
 import hashlib
+import jwt
+import os
 from datetime import datetime
 
 import classroom_models
+
+JWT_SECRET = os.environ['JWT_SECRET']
 
 app = Flask(__name__)
 
@@ -34,9 +38,42 @@ def check_password(hash, salt, plaintext) -> bool:
     return compare_digest(hash, input_hash)
 
 
+def generate_token(id):
+    return jwt.encode({'id': id}, JWT_SECRET, algorithm='HS256')
+
+def get_id_from_token(token):
+    try:
+        return jwt.decode(token, JWT_SECRET, algorithms=['HS256'])['id']
+    except:
+        return None
+
+def get_user_from_token(token):
+    if token is None:
+        return None
+
+    id = get_id_from_token(token)
+    if id is None:
+        return None
+
+    return classroom_models.ClassroomUser.get_user_by_id(id)
+
 @app.route('/')
 def index():
+    user = get_user_from_token(request.cookies.get('token'))
+
+    if user is not None:
+        return redirect('/home')
+
     return render_template('index.html')
+
+@app.route('/home')
+def home():
+    user = get_user_from_token(request.cookies.get('token'))
+
+    if user is None:
+        return redirect('/')
+
+    return 'hi welcome home if you got here you logged in'
 
 @app.route('/signup', methods=['GET'])
 def signup():
@@ -130,7 +167,10 @@ def login_to_classroom(classroom_public_id):
         if not check_password(user.password, user.salt, password):
             return render_template('login_to_classroom.html', school_system=school_system.name, error='Please check your username and password and try again'), 400
         
-        return 'signed in [ no token yet :(  ]'
+        response = make_response(redirect('/home'))
+        response.set_cookie('token', generate_token(user.id))
+
+        return response
 
         
 
