@@ -113,6 +113,13 @@ def signup_open():
             if is_student(f'{fname} {lname}', request.form['bday']):
                 return render_template('signup_outcome.html', signup_sucess=False)
         
+        full_name = None
+        if mname is not None:
+            full_name = f'{fname} {mname} {lname}'
+        else:
+            full_name = f'{fname} {lname}'
+
+        open_models.OpenUser.create_user(request.form['email'], full_name, request.form['password'])        
         return render_template('signup_outcome.html', signup_sucess=True)
 
 @app.route('/login')
