@@ -90,7 +90,6 @@ def login_api():
     query = request.args.get('search')
 
     possible_school_systems = classroom_models.SchoolSystem.search_school_systems(query)
-    print(possible_school_systems)
     response_dict = {}
 
     for school_system in possible_school_systems:

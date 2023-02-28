@@ -51,8 +51,6 @@ class SchoolSystem:
 
         school_systems = []
 
-        print(response, name)
-
         for line in response:
             id = line[0]
             school_systems.append(SchoolSystem.get_school_system_by_id(id))
