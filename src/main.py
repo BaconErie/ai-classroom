@@ -162,6 +162,9 @@ def login_to_classroom(classroom_public_id):
 
         user = classroom_models.ClassroomUser.get_user_by_email(email)
 
+        if user.school_system != school_system:
+            return render_template('login_to_classroom.html', school_system=school_system.name, error='Please check your username and password and try again'), 400
+
         if user is None:
             return render_template('login_to_classroom.html', school_system=school_system.name, error='Please check your username and password and try again'), 400
         
