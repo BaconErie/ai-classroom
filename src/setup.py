@@ -1,4 +1,5 @@
 import sqlite3
+import classroom_models
 
 DEFAULT_LIST = [
 ]
@@ -87,3 +88,25 @@ if response.fetchone() is None:
     connection.commit()
 
 connection.close()
+
+
+
+
+
+#####################
+# SETUP THE CLASSES #
+#####################
+
+if __name__ == '__main__':
+    # Create two demo school systems
+    demo_schools = classroom_models.SchoolSystem.create_school_system('Demo County Public Schools')
+    classroom_models.SchoolSystem.create_school_system('Denham School District')
+
+    # Create a demo teacher
+    teacher = classroom_models.ClassroomUser.create_user('teacher@demo.edu', 'Teacher Name', 'password', demo_schools, True)
+
+    # Create a demo classroom
+    classroom = classroom_models.Classroom.create_classroom(teacher, 'Demo English Classroom', demo_schools)
+
+    # Create a demo student
+    student = classroom_models.ClassroomUser.create_user('student@demo.edu', 'Student Name', 'password', demo_schools, False)
