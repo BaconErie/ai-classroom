@@ -36,12 +36,38 @@ response = cursor.execute('SELECT name FROM sqlite_master WHERE type=\'table\' A
 if response.fetchone() is None:
     cursor.execute('CREATE TABLE open_chat_sessions (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT, user_id INTEGER)')
 
+
+
+
+####################
+# CLASSROOM TABLES #
+####################
+
+# main_classroom_table #
+# Keeps id of classroom, teacher_id, name, join_code 
+
+response = cursor.execute('SELECT name FROM sqlite_master WHERE type=\'table\' AND name=\'main_classroom_table\';')
+
+if response.fetchone() is None:
+    cursor.execute('CREATE TABLE main_classroom_table (id INTEGER PRIMARY KEY AUTOINCREMENT, teacher_id INTEGER, name TEXT, join_code INTEGER)')
+
+# classroom_students #
+# Links student_ids and their respective session_id to classroom_ids
+
+response = cursor.execute('SELECT name FROM sqlite_master WHERE type=\'table\' AND name=\'classroom_students\';')
+
+if response.fetchone() is None:
+    cursor.execute('CREATE TABLE classroom_students (classroom_id INTEGER, student_id INTEGER, session_id INTEGER);')
+
 # Create table for classroom_chat_sessions
 
 response = cursor.execute('SELECT name FROM sqlite_master WHERE type=\'table\' AND name=\'classroom_chat_sessions\';')
 
 if response.fetchone() is None:
     cursor.execute('CREATE TABLE classroom_chat_sessions (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT, user_id INTEGER, classroom_id INTEGER)')
+
+
+
 
 
 response = cursor.execute('SELECT name FROM sqlite_master WHERE type=\'table\' AND name=\'STUDENT_NAMES\';')
