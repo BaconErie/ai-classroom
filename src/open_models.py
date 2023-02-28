@@ -38,7 +38,7 @@ class OpenUser:
 
     def create_user(email, name, password):
         if OpenUser.get_user_by_email(email) is not None:
-            raise UserAlreadyExistsException(email)
+            raise OpenUserAlreadyExistsException(email)
 
 
         # PASSWORD HASHING #
@@ -177,7 +177,7 @@ class ChatLogEntry:
     def __ne__(self, other):
         return self.response != other
 
-class UserAlreadyExistsException(Exception):
+class OpenUserAlreadyExistsException(Exception):
 
     def __init__(self, email):
         self.email = email
