@@ -80,6 +80,8 @@ class OpenUser:
         cursor.execute('SELECT id, name FROM open_chat_sessions WHERE user_id=?', [self.id])
         response = cursor.fetchall()
 
+        connection.close()
+
         if len(response) == 0:
             return None
 
