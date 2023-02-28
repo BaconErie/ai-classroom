@@ -96,7 +96,7 @@ def signup_open():
         if request.form['bday'] == '':
             return render_template('signup_open.html', error='Please enter a birthdate.'), 400
         
-        if len(request.form['password']) <= 8:
+        if len(request.form['password']) < 8:
             return render_template('signup_open.html', error='Please enter a password that is at least 8 characters long.'), 400
         
         if request.form['id'] == '':
