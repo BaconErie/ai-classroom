@@ -17,6 +17,14 @@
                 <h3>{{ school_system }}</h3>
 
                 <form method="post" id="login-form">
+
+                    {% if error %}
+                    <div id="error">
+                        <b>Error</b>: {{error}}
+                    </div>
+                    <br>
+                    {% endif %}
+                    
                     <label for="email">Email</label><br>
                     <input type="text" name="email"><br><br>
 
