@@ -27,12 +27,13 @@ async function stopTypingTimeoutEnd() {
         link.href = `/login/classroom/${json[key]}`;
 
         schoolList.appendChild(link);
+        schoolList.appendChild(document.createElement('br'))
     }
 }
 
 async function searchBarChanged(event) {
     clearTimeout(stopTypingTimeout);
-    stopTypingTimeout = setTimeout(stopTypingTimeoutEnd, 1000);
+    stopTypingTimeout = setTimeout(stopTypingTimeoutEnd, 100);
 }
 
 searchBar.addEventListener('input', searchBarChanged)
