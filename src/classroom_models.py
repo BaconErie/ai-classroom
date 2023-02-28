@@ -17,6 +17,9 @@ class SchoolSystem:
 
         connection.close()
 
+        if response is None:
+            return None
+
         name = response[0]
 
         return SchoolSystem(id, name)
@@ -35,6 +38,27 @@ class SchoolSystem:
         connection.close()
 
         return SchoolSystem(id, name)
+    
+    def search_school_systems(name: str) -> List[SchoolSystem]:
+        connection = sqlite3.connect('data.db')
+        cursor = connection.cursor()
+
+        cursor.execute('SELECT id FROM school_systems WHERE name LIKE ?', [f'{name}%'])
+
+        response = cursor.fetchall()
+
+        connection.close()
+
+        school_systems = []
+
+        print(response, name)
+
+        for line in response:
+            id = line[0]
+            school_systems.append(SchoolSystem.get_school_system_by_id(id))
+
+        return school_systems
+
 
     def __init__(self, id, name):
         self.id = id
