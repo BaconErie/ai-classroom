@@ -1,8 +1,10 @@
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, abort
 from random import randint
 import sqlite3
 import hashlib, hmac
 from datetime import datetime
+
+import classroom_models
 
 app = Flask(__name__)
 
@@ -79,11 +81,25 @@ def login_classroom():
 
 @app.route('/login/classroom/api')
 def login_api():
-    return {str(randint(1,19)): 'id'}
+    query = request.args.get('search')
+
+    possible_school_systems = classroom_models.SchoolSystem.search_school_systems(query)
+    print(possible_school_systems)
+    response_dict = {}
+
+    for school_system in possible_school_systems:
+        response_dict[school_system.name] = school_system.id
+
+    return response_dict
 
 @app.route('/login/classroom/<classroom_public_id>')
 def login_to_classroom(classroom_public_id):
-    return render_template('login_to_classroom.html', school_system='Proxy County Public Schools')
+    school_system = classroom_models.SchoolSystem.get_school_system_by_id(classroom_public_id)
+
+    if school_system is None:
+        abort(404)
+
+    return render_template('login_to_classroom.html', school_system=school_system.name)
 
 if __name__ == '__main__':
     app.run()
