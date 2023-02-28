@@ -39,10 +39,9 @@ def ai_output(string):
         while text[0] == '\n':
             text = text[1:]
     except:
-        print("")
+        pass
     text = "\n " + text
     text += "\n"
-    print(text)
 
     total_input += text
     return ai_things
