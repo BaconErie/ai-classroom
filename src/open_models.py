@@ -165,6 +165,7 @@ class OpenChatSession:
 
 class ChatLogEntry:
     def __init__(self, id, prompt, response, date, session):
+        self.id = int(id)
         self.prompt = prompt
         self.response = response
         self.date = date
