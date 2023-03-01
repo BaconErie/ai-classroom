@@ -67,7 +67,7 @@ class OpenUser:
 
     def __init__(self, id, email, name, password, salt):
         '''NOTE: This function should NOT be called directly. Please use the create_user classmethod'''
-        self.id = id
+        self.id = int(id)
         self.email = email
         self.name = name
         self.password = password
@@ -108,7 +108,7 @@ class OpenUser:
 
 class OpenChatSession:
     def __init__(self, id, name, owner):
-        self.id = id
+        self.id = int(id)
         self.name = name
         self.owner = owner
     

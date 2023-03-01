@@ -59,7 +59,7 @@ class SchoolSystem:
 
 
     def __init__(self, id, name):
-        self.id = id
+        self.id = int(id)
         self.name = name
 
 
@@ -137,7 +137,7 @@ class Classroom:
     
     # INSTANCE METHODS #
     def __init__(self, id: int, teacher: ClassroomUser, name: str, join_code: int, school_system: SchoolSystem):
-        self.id = id
+        self.id = int(id)
         self.teacher = teacher
         self.name = name
         self.join_code = join_code
@@ -255,7 +255,7 @@ class ClassroomUser:
 
     def __init__(self, id, email, name, password, salt, school_system, is_teacher):
         '''NOTE: This function should NOT be called directly. Please use the create_user classmethod'''
-        self.id = id
+        self.id = int(id)
         self.email = email
         self.name = name
         self.password = password
@@ -324,7 +324,7 @@ class ClassroomUser:
 
 class ClassroomChatSession:
     def __init__(self, id, name, owner, classroom):
-        self.id = id
+        self.id = int(id)
         self.name = name
         self.owner = owner
         self.classroom = classroom
