@@ -83,8 +83,26 @@ def home():
 
     if user is None:
         return redirect('/')
-
-    return 'hi welcome home if you got here you logged in'
+    
+    if type(user) == classroom_models.ClassroomUser:
+        classroom_names = []
+        classroom_objects = user.get_classrooms()
+        
+        if classroom_objects is not None:
+            for classroom in classroom_objects:
+                classroom_names.append(classroom.name)
+        
+        return classroom_names
+    
+    elif type(user) == open_models.OpenUser:
+        chat_session_names = []
+        chat_session_objects = user.get_chat_sessions()
+        
+        if chat_session_objects is not None:
+            for chat_session in chat_session_objects:
+                chat_session_names.append(chat_session.id)
+        
+        return chat_session_names
 
 @app.route('/signup', methods=['GET'])
 def signup():
