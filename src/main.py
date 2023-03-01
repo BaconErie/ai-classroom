@@ -39,12 +39,18 @@ def check_password(hash, salt, plaintext) -> bool:
     return compare_digest(hash, input_hash)
 
 
-def generate_token(id):
-    return jwt.encode({'id': id}, JWT_SECRET, algorithm='HS256')
+def generate_token(id: int, is_open: bool):
+    return jwt.encode({'id': id, 'is_open': is_open}, JWT_SECRET, algorithm='HS256')
 
 def get_id_from_token(token):
     try:
         return jwt.decode(token, JWT_SECRET, algorithms=['HS256'])['id']
+    except:
+        return None
+
+def is_open_from_token(token):
+    try:
+        return jwt.decode(token, JWT_SECRET, algorithms=['HS256'])['is_open']
     except:
         return None
 
@@ -53,10 +59,14 @@ def get_user_from_token(token):
         return None
 
     id = get_id_from_token(token)
-    if id is None:
+    is_open = is_open_from_token(token)
+    if id is None or is_open is None:
         return None
-
-    return classroom_models.ClassroomUser.get_user_by_id(id) or open_models.OpenUser.get_user_by_id(id)
+    
+    if is_open:
+        return open_models.OpenUser.get_user_by_id(id)
+    else:
+        return classroom_models.ClassroomUser.get_user_by_id(id)
 
 @app.route('/')
 def index():
@@ -73,8 +83,26 @@ def home():
 
     if user is None:
         return redirect('/')
-
-    return 'hi welcome home if you got here you logged in'
+    
+    if type(user) == classroom_models.ClassroomUser:
+        classroom_names = []
+        classroom_objects = user.get_classrooms()
+        
+        if classroom_objects is not None:
+            for classroom in classroom_objects:
+                classroom_names.append(classroom.name)
+        
+        return classroom_names
+    
+    elif type(user) == open_models.OpenUser:
+        chat_session_names = []
+        chat_session_objects = user.get_chat_sessions()
+        
+        if chat_session_objects is not None:
+            for chat_session in chat_session_objects:
+                chat_session_names.append(chat_session.id)
+        
+        return chat_session_names
 
 @app.route('/signup', methods=['GET'])
 def signup():
@@ -146,7 +174,7 @@ def login():
             return render_template('login_to_classroom.html', error='Please check your username and password and try again'), 400
         
         response = make_response(redirect('/home'))
-        response.set_cookie('token', generate_token(user.id))
+        response.set_cookie('token', generate_token(user.id, True))
 
         return response
 
@@ -203,7 +231,7 @@ def login_to_classroom(classroom_public_id):
             return render_template('login_to_classroom.html', school_system=school_system.name, error='Please check your username and password and try again'), 400
         
         response = make_response(redirect('/home'))
-        response.set_cookie('token', generate_token(user.id))
+        response.set_cookie('token', generate_token(user.id, True))
 
         return response
 
