@@ -39,12 +39,18 @@ def check_password(hash, salt, plaintext) -> bool:
     return compare_digest(hash, input_hash)
 
 
-def generate_token(id):
-    return jwt.encode({'id': id}, JWT_SECRET, algorithm='HS256')
+def generate_token(id: int, is_open: bool):
+    return jwt.encode({'id': id, 'is_open': is_open}, JWT_SECRET, algorithm='HS256')
 
 def get_id_from_token(token):
     try:
         return jwt.decode(token, JWT_SECRET, algorithms=['HS256'])['id']
+    except:
+        return None
+
+def is_open_from_token(token):
+    try:
+        return jwt.decode(token, JWT_SECRET, algorithms=['HS256'])['is_open']
     except:
         return None
 
@@ -53,10 +59,14 @@ def get_user_from_token(token):
         return None
 
     id = get_id_from_token(token)
-    if id is None:
+    is_open = is_open_from_token(token)
+    if id is None or is_open is None:
         return None
-
-    return classroom_models.ClassroomUser.get_user_by_id(id) or open_models.OpenUser.get_user_by_id(id)
+    
+    if is_open:
+        return open_models.OpenUser.get_user_by_id(id)
+    else:
+        return classroom_models.ClassroomUser.get_user_by_id(id)
 
 @app.route('/')
 def index():
