@@ -92,7 +92,7 @@ def home():
             for classroom in classroom_objects:
                 classroom_names.append(classroom.name)
         
-        return classroom_names
+        return render_template('home.html', is_open=False, is_teacher=user.is_teacher, classroom_names=classroom_names)
     
     elif type(user) == open_models.OpenUser:
         chat_session_names = []
@@ -102,7 +102,7 @@ def home():
             for chat_session in chat_session_objects:
                 chat_session_names.append(chat_session.id)
         
-        return chat_session_names
+        return render_template('home.html', is_open=True, chat_session_names=chat_session_names)
 
 @app.route('/signup', methods=['GET'])
 def signup():

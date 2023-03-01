@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Terminal</title>
+        <link rel="stylesheet" href="{{ url_for('static', filename='home.css') }}">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+    </head>
+
+    <body>
+        <div id="topbar">
+            <h1><a href="/">Terminal</a></h1>
+            <div id="actions-link-wrapper">
+                {% if not is_open and is_teacher %}
+                <p id="create" class="action">Create Classroom</p>
+                {% elif not is_open and not is_teacher %}
+                <p id="join" class="action">Join Classroom</p>
+                {% elif is_open %}
+                <p id="new" class="action">New Chat Session</p>
+                {% endif %}
+                <a href="/logout">Logout</a>
+            </div>
+        </div>
+
+        <div id="main-wrapper">
+            {% if not is_open %}
+            <h2>Your classrooms</h2><br>
+            <div id="classrooms-wrapper">
+                {% if classroom_names %}
+                {% for classroom_name in classroom_names %}
+                <a href="/">
+                <div class="border shadow">
+                    {{classroom_name}}
+                </div>
+                </a>
+                {% endfor %}
+                {% else %}
+                <p>You aren't in any classes. Join a class to start!</p>
+                {% endif %}
+            </div>
+            {% endif %}
+            {% if is_open %}
+            <h2>Your chat sessions</h2><br>
+            <div id="chat-session-wrapper" class="border">
+                {% if classroom_names %}
+                {% for session_name in chat_session_names %}
+                <a href="/">
+                <div class="border shadow">
+                    {{session_name}}
+                </div>
+                </a>
+                {% endfor %}
+                {% else %}
+                <p>Create a new chat session to start</p>
+                {% endif %}
+            </div>
+            {% endif %}
+        </div>
+
+        <script src="{{ url_for('static', filename='scripts/home.js') }}"></script>
+    </body>
+</html>
