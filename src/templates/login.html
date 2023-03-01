@@ -14,6 +14,8 @@
         <div id="main-wrapper">
             <div id="main-content">
                 <h2>Log in</h2>
+
+                {% if not error %}
                 <div id="choose-role">
                     <div class="role-button" id="classroom">
                         <h3>I am a teacher or student</h3>
@@ -25,8 +27,14 @@
                         <p>Log into an Terminal Open account</p>
                     </div>
                 </div>
+                {% endif %}
 
                 <form action="/login" method="post" id="login-form" class="hidden">
+                    {% if error %}
+                    <div id="error">
+                        <b>Error</b>: {{error}}
+                    </div>
+                    {% endif %}
                     <label for="email">Email</label><br>
                     <input type="text" name="email"><br><br>
 
