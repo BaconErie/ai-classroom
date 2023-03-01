@@ -156,7 +156,7 @@ def login():
             return render_template('login_to_classroom.html', error='Please check your username and password and try again'), 400
         
         response = make_response(redirect('/home'))
-        response.set_cookie('token', generate_token(user.id))
+        response.set_cookie('token', generate_token(user.id, True))
 
         return response
 
@@ -213,7 +213,7 @@ def login_to_classroom(classroom_public_id):
             return render_template('login_to_classroom.html', school_system=school_system.name, error='Please check your username and password and try again'), 400
         
         response = make_response(redirect('/home'))
-        response.set_cookie('token', generate_token(user.id))
+        response.set_cookie('token', generate_token(user.id, True))
 
         return response
 
