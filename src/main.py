@@ -77,32 +77,62 @@ def index():
 
     return render_template('index.html')
 
-@app.route('/home')
+@app.route('/home', methods=['GET', 'POST'])
 def home():
-    user = get_user_from_token(request.cookies.get('token'))
+    if request.method == 'GET':
+        user = get_user_from_token(request.cookies.get('token'))
 
-    if user is None:
-        return redirect('/')
-    
-    if type(user) == classroom_models.ClassroomUser:
-        classroom_names = []
-        classroom_objects = user.get_classrooms()
+        if user is None:
+            return redirect('/')
         
-        if classroom_objects is not None:
-            for classroom in classroom_objects:
-                classroom_names.append(classroom.name)
+        if type(user) == classroom_models.ClassroomUser:
+            classroom_names = []
+            classroom_objects = user.get_classrooms()
+            
+            if classroom_objects is not None:
+                for classroom in classroom_objects:
+                    classroom_names.append(classroom.name)
+            
+            return render_template('home.html', is_open=False, is_teacher=user.is_teacher, classroom_names=classroom_names)
         
-        return render_template('home.html', is_open=False, is_teacher=user.is_teacher, classroom_names=classroom_names)
-    
-    elif type(user) == open_models.OpenUser:
-        chat_session_names = []
-        chat_session_objects = user.get_chat_sessions()
+        elif type(user) == open_models.OpenUser:
+            chat_session_names = []
+            chat_session_objects = user.get_chat_sessions()
+            
+            if chat_session_objects is not None:
+                for chat_session in chat_session_objects:
+                    chat_session_names.append(chat_session.id)
+            
+            return render_template('home.html', is_open=True, chat_session_names=chat_session_names)
+    elif request.method == 'POST':
+        user = get_user_from_token(request.cookies.get('token'))
+
+        if user is None:
+            return redirect('/')
         
-        if chat_session_objects is not None:
-            for chat_session in chat_session_objects:
-                chat_session_names.append(chat_session.id)
-        
-        return render_template('home.html', is_open=True, chat_session_names=chat_session_names)
+        if type(user) == classroom_models.ClassroomUser:
+            if user.is_teacher:
+                name = request.form['classroom_name']
+
+                new_classroom = classroom_models.Classroom.create_classroom(user, name, user.school_system)
+
+                return redirect(f'/classroom/{new_classroom.id}')
+            
+            else:
+                join_code = request.form['join_code']
+
+                classroom = classroom_models.Classroom.get_classroom_by_join_code(join_code)
+
+                classroom.add_student(user)
+
+                return redirect(f'/classroom/{classroom.id}')
+            
+        elif type(user) == open_models.OpenUser:
+            session_name = request.form['name']
+
+            new_session = user.create_chat_session()
+
+            # TODO: FINISH LIKE THE CREATE STUFF AND STUFF
 
 @app.route('/signup', methods=['GET'])
 def signup():
@@ -235,7 +265,12 @@ def login_to_classroom(classroom_public_id):
 
         return response
 
-        
+@app.route('/logout')
+def logout():
+    response = make_response(redirect('/'))
+    response.set_cookie('token', '', expires=0)
+
+    return response
 
 if __name__ == '__main__':
     app.run()

@@ -1,14 +1,14 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <title>Terminal</title>
+        <title>TERMinal</title>
         <link rel="stylesheet" href="{{ url_for('static', filename='home.css') }}">
         <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
     </head>
 
     <body>
         <div id="topbar">
-            <h1><a href="/">Terminal</a></h1>
+            <h1><a href="/">TERMinal</a></h1>
             <div id="actions-link-wrapper">
                 {% if not is_open and is_teacher %}
                 <p id="create" class="action">Create Classroom</p>
@@ -20,6 +20,39 @@
                 <a href="/logout">Logout</a>
             </div>
         </div>
+
+        <div id="myModal" class="modal">
+
+            <!-- Modal content -->
+            <div class="modal-content border">
+                {% if not is_open and is_teacher %}
+                <h1>Create Classroom</h1><br>
+                <form method="post">
+                    <label for="classroom_name">Classroom name</label><br>
+                    <input name="classroom_name" type="text" placeholder="Enter classroom name"><br><br>
+                    <input type="submit" value="Create">
+                </form>
+
+                {% elif not is_open and not is_teacher %}
+                <h1>Join Classroom</h1>
+                <form method="post">
+                    <label for="join_code">Classroom join code</label><br>
+                    <input name="join_code" type="text" placeholder="Join code"><br><br>
+                    <input type="submit" value="Join">
+                </form>
+                {% elif is_open %}
+                <h1>New Chat Session</h1>
+                <form method="post">
+                    <label for="name">Chat session name</label><br>
+                    <input name="name" type="text" placeholder="Enter classroom name"><br><br>
+                    <input type="submit" value="Create">
+                </form>
+                {% endif %}
+
+                <button id="cancel">Cancel</button>
+            </div>
+          
+          </div>
 
         <div id="main-wrapper">
             {% if not is_open %}
