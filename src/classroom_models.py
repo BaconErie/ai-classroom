@@ -191,6 +191,13 @@ class Classroom:
         connection.close()
 
         return response[0]
+    
+    def is_student_in_classroom(self, student):
+        for user in self.get_students():
+            if user.id == student.id:
+                return True
+        
+        return False
 
 
 class ClassroomUser:
