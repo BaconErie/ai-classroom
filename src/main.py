@@ -130,9 +130,9 @@ def home():
         elif type(user) == open_models.OpenUser:
             session_name = request.form['name']
 
-            new_session = user.create_chat_session()
+            new_session = user.create_chat_session(session_name)
 
-            # TODO: FINISH LIKE THE CREATE STUFF AND STUFF
+            return redirect(f'/chat/{new_session.id}')
 
 @app.route('/signup', methods=['GET'])
 def signup():
@@ -264,6 +264,79 @@ def login_to_classroom(classroom_public_id):
         response.set_cookie('token', generate_token(user.id, True))
 
         return response
+    
+@app.route('/classroom/<classroom_id>')
+def classroom(classroom_id):
+    classroom = classroom_models.Classroom.get_classroom_by_id(classroom_id)
+    user = get_user_from_token(request.cookies.get('token'))
+
+    if user is None:
+        return redirect('/')
+
+    if classroom is None:
+        abort(404)
+    
+    if user.is_teacher and classroom.teacher.id == user.id:
+        student_names = {}
+        for student in classroom.get_students():
+            student_names[student.name] = student.id
+
+        return render_template('classroom_teacher.html', join_code=classroom.join_code, student_names=student_names, classroom_name=classroom.name, chat_allowed=classroom.is_chat_allowed(), chat_allowed=classroom.is_logs_allowed())
+
+    elif classroom.is_student_in_classroom(user):
+        logs = {}
+        
+        if classroom.is_logs_allowed():
+            for entry in user.get_chat_sessions_by_classroom(classroom):
+                logs[entry.prompt] = entry.response
+
+            return render_template('classroom_student.html', classroom_name=classroom.name, logs_allowed=True, chat_allowed=classroom.is_chat_allowed(), logs=logs)
+        else:
+            return render_template('classroom_student.html', classroom_name=classroom.name, logs_allowed=False, chat_allowed=classroom.is_chat_allowed())
+    
+    else:
+        abort(403)
+
+@app.route('/classroom/<classroom_id>/api')
+def classroom_say(classroom_id):
+    classroom = classroom_models.Classroom.get_classroom_by_id(classroom_id)
+    user = get_user_from_token(request.cookies.get('token'))
+
+    if user is None:
+        return redirect('/')
+
+    if classroom is None:
+        abort(404)
+    
+    if classroom.is_student_in_classroom(user) == False:
+        abort(403)
+    
+    if classroom.is_chat_allowed() == False:
+        abort(400)
+
+    entry = user.get_chat_sessions_by_classroom(classroom).say(request.data)
+
+    return entry.response
+
+@app.route('/classroom/<classroom_id>/settings', methods=['POST'])
+def classroom_say(classroom_id):
+    classroom = classroom_models.Classroom.get_classroom_by_id(classroom_id)
+    user = get_user_from_token(request.cookies.get('token'))
+
+    if user is None:
+        return redirect('/')
+
+    if classroom is None:
+        abort(404)
+    
+    if classroom.teacher.id != user.id:
+        abort(403)
+
+    allow_chat = request.form['chat']
+    allow_logs = request.form['logs']
+
+    classroom.set_chat_allowed(allow_chat)
+    classroom.set_logs_allowed(allow_logs)
 
 @app.route('/logout')
 def logout():

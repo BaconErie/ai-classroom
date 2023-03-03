@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>TERMinal</title>
+        <link rel="stylesheet" href="{{ url_for('static', filename='login.css') }}">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+    </head>
+
+    <body>
+        <div id="topbar">
+            <h1><a href="/">TERMinal</a></h1>
+            <div id="actions-link-wrapper">
+                <a href="/logout">Logout</a>
+            </div>
+        </div>
+
+        <div id="main-wrapper">
+            <div id="main-content">
+                <h2>{{classroom_name}}</h2><br>
+                <h2>Talk to the chatbot</h2>
+                <div class="border">
+                    <div id="list">
+                        {% if logs_allowed %}
+                        {% for input in logs.keys() %}
+                        <div>
+                            <p>You: {{input}}</p>
+                            <p>Chatbot: {{logs[input]}}</p>
+                            <br><br><br>
+                        </div>
+                        {% endfor %}
+                        {% else %}
+                        <p>Your teacher has disabled viewing chatbot logs.</p>
+                        {% endif %}
+                    </div>
+                    {% if chat_allowed and logs_allowed %}
+                        <input type="text" placeholder="Say something to the chatbot..." id="prompt-box">
+                        <button id="submit">Send</button>
+                    {% else %}
+                        <input type="text" placeholder="Your teacher has disabled the chatbot." id="prompt-box" disabled>
+                        <button id="submit" disabled>Send</button>
+                </div>
+                </div>
+            </div>
+        </div>
+
+        <script src="{{ url_for('static', filename='scripts/student.js') }}"></script>
+    </body>
+</html>

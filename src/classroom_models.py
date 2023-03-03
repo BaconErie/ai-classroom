@@ -170,11 +170,13 @@ class Classroom:
         connection.commit()
         connection.close()
 
+        student.create_chat_session('', self)
+
     def is_chat_allowed(self) -> bool:
         connection = sqlite3.connect('data.db')
         cursor = connection.cursor()
 
-        cursor.execute('SELECT is_chat_allowed FROM main_classroom_table WHERE classroom_id=?', [self.id])
+        cursor.execute('SELECT is_chat_allowed FROM main_classroom_table WHERE id=?', [self.id])
         response = cursor.fetchone()
 
         connection.close()
@@ -185,7 +187,7 @@ class Classroom:
         connection = sqlite3.connect('data.db')
         cursor = connection.cursor()
 
-        cursor.execute('SELECT is_log_allowed FROM main_classroom_table WHERE classroom_id=?', [self.id])
+        cursor.execute('SELECT is_log_allowed FROM main_classroom_table WHERE id=?', [self.id])
         response = cursor.fetchone()
 
         connection.close()
@@ -198,6 +200,24 @@ class Classroom:
                 return True
         
         return False
+    
+    def set_chat_allowed(self, chat_allowed):
+        connection = sqlite3.connect('data.db')
+        cursor = connection.cursor()
+
+        cursor.execute('UPDATE main_classroom_table SET is_chat_allowed=? WHERE id=?', [chat_allowed, self.id])
+        connection.commit()
+
+        connection.close()
+    
+    def set_logs_allowed(self, logs_allowed):
+        connection = sqlite3.connect('data.db')
+        cursor = connection.cursor()
+
+        cursor.execute('UPDATE main_classroom_table SET is_logs_allowed=? WHERE id=?', [logs_allowed, self.id])
+        connection.commit()
+
+        connection.close()
 
 
 class ClassroomUser:

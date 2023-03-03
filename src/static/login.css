@@ -18,6 +18,12 @@ div {
     width: 30em;
 }
 
+.border {
+    border-radius: 15px;
+    border-style: solid;
+    padding: 1em;
+}
+
 #choose-role {
     display: flex;
     flex-direction: row;

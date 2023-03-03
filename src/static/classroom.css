@@ -1,0 +1,15 @@
+#students-list {
+    height: 100%;
+}
+
+#content {
+    height: 100%;
+    width: calc(100% - 50em);
+    float: right;
+}
+
+#sidebar {
+    height: 100%;
+    width: 50em;
+    float: left;
+}

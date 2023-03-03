@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>TERMinal</title>
+        <link rel="stylesheet" href="{{ url_for('static', filename='home.css') }}">
+        <link rel="stylesheet" href="{{ url_for('static', filename='classroom.css') }}">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+    </head>
+
+    <body>
+        <div id="topbar">
+            <h1><a href="/">TERMinal</a></h1>
+            <div id="actions-link-wrapper">
+                <p><b>Join Code:</b> {{join_code}}</p>
+                <a href="/logout">Logout</a>
+            </div>
+        </div>
+
+        <div id="main-wrapper">
+            <h2>{{classroom_name}}</h2><br>
+
+            <div id="horizontal-split">
+
+                <div id="content">
+                    <div id="students-list" class="border">
+                        <h3>Student Chat Sessions</h3>
+
+                        {% if len(student_names) != 0 %}
+                        {% for name in student_names.keys() %}
+                        <div class="border">
+                            <a href="./view/{{student_names[name]}}">{{name}}</a>
+                        </div>
+                        {% endfor %}
+                        {% else %}
+                        <p>There are currently no students in your classroom. Send them the join code at the top to have them join.</p>
+                    </div>
+
+                    <div id="settings" class="border hidden">
+                        <h3>Settings</h3>
+
+                        <form id="settings-form" action="./settings" method="post">
+                            <input type="checkbox" id="allow-chat" name="chat" {% if chat_allowed %}checked{% endif %}>
+                            <label for="chat">Allow students to use the chatbot</label><br><br>
+
+                            <input type="checkbox" id="allow-logs" name="logs" {% if logs_allowed %}checked{% endif %}>
+                            <label for="chat">Allow students to view chatbot logs.</label>
+
+                            <p>Note: Disabling chatbot logs will prevent students from using the chatbot.</p>
+                        </form>
+                    </div>
+                </div>
+
+                <div id="sidebar">
+                    <div id="students-button" class="border shadow">Students</div>
+                    <div id="settings-button" class="border shadow">Settings</div>
+                </div>
+            </div>
+        </div>
+
+        <script src="{{ url_for('static', filename='scripts/teacher.js') }}"></script>
+    </body>
+</html>
