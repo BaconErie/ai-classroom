@@ -15,10 +15,13 @@ JWT_SECRET = os.environ['JWT_SECRET']
 app = Flask(__name__)
 
 def is_student(name, birthdate):
+    print(name)
     date = int(datetime.strptime(birthdate, '%Y-%m-%d').timestamp())
 
     connection = sqlite3.connect('data.db')
     cursor = connection.cursor()
+
+    print(name[-2:])
 
     cursor.execute('SELECT hash, salt FROM STUDENT_NAMES WHERE suffix=?', [name[-2:]])
     response = cursor.fetchall()
@@ -26,10 +29,14 @@ def is_student(name, birthdate):
     for line in response:
         hash_to_match = line[0]
         salt = line[1]
+        print('sa,t', salt)
+        
 
+        print('curr tn date', date)
         current_hash = hashlib.sha256(f'{name};{date};{salt}'.encode('utf-8')).hexdigest()
-
-        if hash_to_match == current_hash:
+        print(current_hash)
+        print(hash_to_match)
+        if compare_digest(current_hash, hash_to_match):
             return True
     
     return False
@@ -50,6 +57,7 @@ def get_id_from_token(token):
 
 def is_open_from_token(token):
     try:
+        print(jwt.decode(token, JWT_SECRET, algorithms=['HS256'])['is_open'])
         return jwt.decode(token, JWT_SECRET, algorithms=['HS256'])['is_open']
     except:
         return None
@@ -81,27 +89,34 @@ def index():
 def home():
     if request.method == 'GET':
         user = get_user_from_token(request.cookies.get('token'))
-
+        print(user.name, type(user))
         if user is None:
-            return redirect('/')
+            return redirect('/')    
         
         if type(user) == classroom_models.ClassroomUser:
-            classroom_names = []
+            classroom_names = {}
             classroom_objects = user.get_classrooms()
+            
             
             if classroom_objects is not None:
                 for classroom in classroom_objects:
-                    classroom_names.append(classroom.name)
+                    classroom_names[classroom.name] = classroom.id
             
+            if len(classroom_names) == 0:
+                classroom_names = None
+            print('100 main', classroom_names)
             return render_template('home.html', is_open=False, is_teacher=user.is_teacher, classroom_names=classroom_names)
         
         elif type(user) == open_models.OpenUser:
-            chat_session_names = []
+            chat_session_names = {}
             chat_session_objects = user.get_chat_sessions()
             
             if chat_session_objects is not None:
                 for chat_session in chat_session_objects:
-                    chat_session_names.append(chat_session.id)
+                    chat_session_names[chat_session.name] = chat_session.id
+            
+            if len(chat_session_names) == 0:
+                chat_session_names = None
             
             return render_template('home.html', is_open=True, chat_session_names=chat_session_names)
     elif request.method == 'POST':
@@ -190,18 +205,18 @@ def login():
         password = request.form['password']
 
         if email == '':
-            return render_template('login_to_classroom.html', error='Please enter an email'), 400
+            return render_template('login.html', error='Please enter an email'), 400
     
         if password == '':
-            return render_template('login_to_classroom.html', error='Please enter your password'), 400
+            return render_template('login.html', error='Please enter your password'), 400
 
         user = open_models.OpenUser.get_user_by_email(email)
 
         if user is None:
-            return render_template('login_to_classroom.html', error='Please check your username and password and try again'), 400
+            return render_template('login.html', error='Please check your username and password and try again'), 400
         
         if not check_password(user.password, user.salt, password):
-            return render_template('login_to_classroom.html', error='Please check your username and password and try again'), 400
+            return render_template('login.html', error='Please check your username and password and try again'), 400
         
         response = make_response(redirect('/home'))
         response.set_cookie('token', generate_token(user.id, True))
@@ -251,17 +266,17 @@ def login_to_classroom(classroom_public_id):
 
         user = classroom_models.ClassroomUser.get_user_by_email(email)
 
-        if user.school_system.id != school_system.id:
+        if user is None:
             return render_template('login_to_classroom.html', school_system=school_system.name, error='Please check your username and password and try again'), 400
 
-        if user is None:
+        if user.school_system.id != school_system.id:
             return render_template('login_to_classroom.html', school_system=school_system.name, error='Please check your username and password and try again'), 400
         
         if not check_password(user.password, user.salt, password):
             return render_template('login_to_classroom.html', school_system=school_system.name, error='Please check your username and password and try again'), 400
         
         response = make_response(redirect('/home'))
-        response.set_cookie('token', generate_token(user.id, True))
+        response.set_cookie('token', generate_token(user.id, False))
 
         return response
     
@@ -280,15 +295,20 @@ def classroom(classroom_id):
         student_names = {}
         for student in classroom.get_students():
             student_names[student.name] = student.id
+        
+        if len(student_names) == 0:
+            student_names = None
 
-        return render_template('classroom_teacher.html', join_code=classroom.join_code, student_names=student_names, classroom_name=classroom.name, chat_allowed=classroom.is_chat_allowed(), chat_allowed=classroom.is_logs_allowed())
+        return render_template('classroom_teacher.html', join_code=classroom.join_code, student_names=student_names, classroom_name=classroom.name, chat_allowed=classroom.is_chat_allowed(), logs_allowed=classroom.is_logs_allowed(), classroom_id=classroom_id)
 
     elif classroom.is_student_in_classroom(user):
         logs = {}
         
         if classroom.is_logs_allowed():
-            for entry in user.get_chat_sessions_by_classroom(classroom):
-                logs[entry.prompt] = entry.response
+            students_chat_session = user.get_chat_sessions_by_classroom(classroom)
+            if students_chat_session is not None:
+                for entry in students_chat_session.get_logs():
+                    logs[entry.prompt] = entry.response
 
             return render_template('classroom_student.html', classroom_name=classroom.name, logs_allowed=True, chat_allowed=classroom.is_chat_allowed(), logs=logs)
         else:
@@ -297,7 +317,7 @@ def classroom(classroom_id):
     else:
         abort(403)
 
-@app.route('/classroom/<classroom_id>/api')
+@app.route('/classroom/<classroom_id>/api', methods=['POST'])
 def classroom_say(classroom_id):
     classroom = classroom_models.Classroom.get_classroom_by_id(classroom_id)
     user = get_user_from_token(request.cookies.get('token'))
@@ -314,12 +334,12 @@ def classroom_say(classroom_id):
     if classroom.is_chat_allowed() == False:
         abort(400)
 
-    entry = user.get_chat_sessions_by_classroom(classroom).say(request.data)
+    entry = user.get_chat_sessions_by_classroom(classroom).say(request.data.decode('utf-8'))
 
     return entry.response
 
 @app.route('/classroom/<classroom_id>/settings', methods=['POST'])
-def classroom_say(classroom_id):
+def classroom_settings(classroom_id):
     classroom = classroom_models.Classroom.get_classroom_by_id(classroom_id)
     user = get_user_from_token(request.cookies.get('token'))
 
@@ -331,12 +351,42 @@ def classroom_say(classroom_id):
     
     if classroom.teacher.id != user.id:
         abort(403)
+    
+    json = request.get_json()
+    print(json)
 
-    allow_chat = request.form['chat']
-    allow_logs = request.form['logs']
+    allow_chat = json['chat']
+    allow_logs = json['logs']
 
     classroom.set_chat_allowed(allow_chat)
     classroom.set_logs_allowed(allow_logs)
+
+    return 'OK', 200
+
+@app.route('/classroom/<classroom_id>/view/<student_id>')
+def view_student(classroom_id, student_id):
+    classroom = classroom_models.Classroom.get_classroom_by_id(classroom_id)
+    user = get_user_from_token(request.cookies.get('token'))
+    student = classroom_models.ClassroomUser.get_user_by_id(student_id)
+
+    if user is None:
+        return redirect('/')
+
+    if classroom is None:
+        abort(404)
+    
+    if classroom.teacher.id != user.id:
+        abort(403)
+    
+    if student is None or classroom.is_student_in_classroom(student) == False:
+        abort(404)
+    
+    logs = {}
+
+    for entry in student.get_chat_sessions_by_classroom(classroom).get_logs():
+        logs[entry.prompt] = entry.response
+    
+    return render_template('view.html', logs=logs, classroom_name=classroom.name, student_name=student.name, )
 
 @app.route('/logout')
 def logout():
@@ -344,6 +394,58 @@ def logout():
     response.set_cookie('token', '', expires=0)
 
     return response
+
+@app.route('/chat/<chat_id>')
+def chat(chat_id):
+    chat_id = int(chat_id)
+    user = get_user_from_token(request.cookies.get('token'))
+
+    if user is None:
+        return redirect('/')
+    
+    chat_sessions = user.get_chat_sessions()
+
+    correct_chat_session = None
+
+    for chat_session in chat_sessions:
+        if chat_session.id == chat_id:
+            correct_chat_session = chat_session
+            break
+
+    if correct_chat_session is None:
+        abort(404)
+    
+    logs = {}
+    
+    for entry in correct_chat_session.get_logs():
+        logs[entry.prompt] = entry.response
+
+    return render_template('open_chat.html', chat_session_name=correct_chat_session.name, logs=logs)
+
+@app.route('/chat/<chat_session_id>/api', methods=['POST'])
+def chat_say(chat_session_id):
+    chat_session_id = int(chat_session_id)
+
+    user = get_user_from_token(request.cookies.get('token'))
+
+    if user is None:
+        return redirect('/')
+    
+    chat_sessions = user.get_chat_sessions()
+
+    correct_chat_session = None
+
+    for chat_session in chat_sessions:
+        if chat_session.id == chat_session_id:
+            correct_chat_session = chat_session
+            break
+
+    if correct_chat_session is None:
+        abort(404)
+
+    entry = correct_chat_session.say(request.data.decode('utf-8'))
+
+    return entry.response
 
 if __name__ == '__main__':
     app.run()

@@ -25,20 +25,23 @@
                     <div id="students-list" class="border">
                         <h3>Student Chat Sessions</h3>
 
-                        {% if len(student_names) != 0 %}
+                        {% if student_names %}
                         {% for name in student_names.keys() %}
                         <div class="border">
-                            <a href="./view/{{student_names[name]}}">{{name}}</a>
+                            <a href="/classroom/{{classroom_id}}/view/{{student_names[name]}}">{{name}}</a>
                         </div>
                         {% endfor %}
                         {% else %}
                         <p>There are currently no students in your classroom. Send them the join code at the top to have them join.</p>
+                        {% endif %}
                     </div>
 
                     <div id="settings" class="border hidden">
                         <h3>Settings</h3>
 
-                        <form id="settings-form" action="./settings" method="post">
+                        <iframe name="dummyframe" id="dummyframe" style="display: none;"></iframe>
+
+                        <form id="settings-form" action="/classroom/{{classroom_id}}/settings" target="dummyframe" method="post">
                             <input type="checkbox" id="allow-chat" name="chat" {% if chat_allowed %}checked{% endif %}>
                             <label for="chat">Allow students to use the chatbot</label><br><br>
 

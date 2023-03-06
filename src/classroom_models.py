@@ -78,7 +78,7 @@ class Classroom:
         if response is None:
             return None
 
-        teacher = response[0]
+        teacher = ClassroomUser.get_user_by_id(response[0])
         name = response[1]
         join_code = response[2]
         school_system_id = response[3]
@@ -99,7 +99,7 @@ class Classroom:
             return None
 
         id = response[0]
-        teacher = response[1]
+        teacher = ClassroomUser.get_user_by_id(response[1])
         name = response[2]
         school_system_id = response[3]
         school_system = SchoolSystem.get_school_system_by_id(school_system_id)
@@ -187,7 +187,7 @@ class Classroom:
         connection = sqlite3.connect('data.db')
         cursor = connection.cursor()
 
-        cursor.execute('SELECT is_log_allowed FROM main_classroom_table WHERE id=?', [self.id])
+        cursor.execute('SELECT is_logs_allowed FROM main_classroom_table WHERE id=?', [self.id])
         response = cursor.fetchone()
 
         connection.close()
@@ -310,14 +310,14 @@ class ClassroomUser:
         if not classroom.is_chat_allowed():
             raise ChatNotAllowed()
 
-        possible_chat_sessions = self.get_chat_sessions_by_classroom()
+        possible_chat_sessions = self.get_chat_sessions_by_classroom(classroom)
         if not self.is_teacher and possible_chat_sessions is not None:
             raise StudentAlreadyHasSession(self, possible_chat_sessions[0])
 
         connection = sqlite3.connect('data.db')
         cursor = connection.cursor()
 
-        cursor.execute('INSERT INTO classroom_chat_sessions (name, user_id) VALUES (?, ?)', [name, self.id])
+        cursor.execute('INSERT INTO classroom_chat_sessions (name, user_id, classroom_id) VALUES (?, ?, ?)', [name, self.id, classroom.id])
         connection.commit()
 
         cursor.execute('SELECT LAST_INSERT_ROWID();')

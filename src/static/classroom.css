@@ -4,12 +4,12 @@
 
 #content {
     height: 100%;
-    width: calc(100% - 50em);
+    width: 75%;
     float: right;
 }
 
 #sidebar {
     height: 100%;
-    width: 50em;
+    width: 25%;
     float: left;
 }

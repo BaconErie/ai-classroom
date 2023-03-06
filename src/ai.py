@@ -4,13 +4,17 @@ import numpy as np
 import pandas as pd
 from matplotlib import pyplot as plt
 
-openai.api_key = ''
+openai.api_key = os.environ['OPENAI_KEY']
 
 
 def ai_output(string):
     ai_things = ""
     total_input = ""
     user_input = ""
+
+    print('\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n')
+    print(type(total_input), type(string))
+    print('\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n')
 
     user_input = string
     total_input += user_input

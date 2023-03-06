@@ -18,16 +18,27 @@ function showStudents() {
     settings.style.display = 'none';
 }
 
+settingsButton.addEventListener('click', showSettings)
+studentsButton.addEventListener('click', showStudents)
 
-
-allowChatCheckbox.addEventListener('clicked', () => {
-    settingsForm.submit();
+allowChatCheckbox.addEventListener('click', () => {
+    sendSettings();
 });
 
-allowLogsCheckbox.addEventListener('clicked', () => {
+allowLogsCheckbox.addEventListener('click', () => {
     if (!allowLogsCheckbox.checked) {
         allowChatCheckbox.checked = false;
     }
 
-    settingsForm.submit();
+    sendSettings();
 });
+
+function sendSettings() {
+    fetch(window.location.pathname + '/settings', {
+        method: 'POST',
+        headers: {
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify({chat: allowChatCheckbox.checked, logs: allowLogsCheckbox.checked})
+    })
+}

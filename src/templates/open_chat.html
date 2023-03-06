@@ -16,11 +16,10 @@
 
         <div id="main-wrapper">
             <div id="main-content">
-                <h2>{{classroom_name}}</h2><br>
+                <h2>{{chat_session_name}}</h2><br>
                 <h2>Talk to the chatbot</h2>
                 <div class="border">
                     <div id="list" style="overflow-y:auto; height:20em;">
-                        {% if logs_allowed %}
                         {% for input in logs.keys() %}
                         <div>
                             <p><b>You</b>: {{input}}</p>
@@ -28,17 +27,9 @@
                             <br><br><br>
                         </div>
                         {% endfor %}
-                        {% else %}
-                        <p>Your teacher has disabled viewing chatbot logs.</p>
-                        {% endif %}
                     </div>
-                    {% if chat_allowed and logs_allowed %}
                         <input type="text" placeholder="Say something to the chatbot..." id="prompt-box">
                         <button id="submit">Send</button>
-                    {% else %}
-                        <input type="text" placeholder="Your teacher has disabled the chatbot." id="prompt-box" disabled>
-                        <button id="submit" disabled>Send</button>
-                    {% endif %}
                 </div>
             </div>
         </div>

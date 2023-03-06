@@ -59,10 +59,10 @@
             <h2>Your classrooms</h2><br>
             <div id="classrooms-wrapper">
                 {% if classroom_names %}
-                {% for classroom_name in classroom_names %}
+                {% for classroom_name in classroom_names.keys() %}
                 <a href="/">
                 <div class="border shadow">
-                    {{classroom_name}}
+                    <a href="/classroom/{{classroom_names[classroom_name]}}">{{classroom_name}}</a>
                 </div>
                 </a>
                 {% endfor %}
@@ -74,11 +74,11 @@
             {% if is_open %}
             <h2>Your chat sessions</h2><br>
             <div id="chat-session-wrapper" class="border">
-                {% if classroom_names %}
-                {% for session_name in chat_session_names %}
+                {% if chat_session_names %}
+                {% for session_name in chat_session_names.keys() %}
                 <a href="/">
                 <div class="border shadow">
-                    {{session_name}}
+                    <a href="/chat/{{chat_session_names[session_name]}}">{{session_name}}</a>
                 </div>
                 </a>
                 {% endfor %}

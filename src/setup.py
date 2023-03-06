@@ -1,5 +1,7 @@
 import sqlite3
 import classroom_models
+import secrets
+import hashlib
 
 DEFAULT_LIST = [
 ]
@@ -84,7 +86,13 @@ response = cursor.execute('SELECT name FROM sqlite_master WHERE type=\'table\' A
 if response.fetchone() is None:
     cursor.execute('CREATE TABLE STUDENT_NAMES (id INTEGER PRIMARY KEY AUTOINCREMENT, hash TEXT, suffix TEXT, salt TEXT);') # Hash will be: Name;Date;Salt in unix time
     
-    cursor.execute('INSERT INTO STUDENT_NAMES (hash, suffix, salt) VALUES (?, ?, ?)', ('2386002a2071edbb03611e081464f52005e9f990627683bdeff643eaa1955d0f', 'me', '175d4547113bc310e46161f20eff50ccc5c5edd621772d9e7537d25a5b13eacabcd5b6274c5375b8e6baa45dbdd3309a6843036fc98aeb66848335a407320d58'))
+    salt = secrets.token_hex(256)
+
+    string = f'Demo Name;946702800;{salt}'
+
+    hash = hashlib.sha256(string.encode('utf-8')).hexdigest()
+
+    cursor.execute('INSERT INTO STUDENT_NAMES (hash, suffix, salt) VALUES (?, ?, ?)', (hash, 'me', salt))
     connection.commit()
 
 connection.close()
